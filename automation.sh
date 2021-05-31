@@ -51,7 +51,7 @@ tar -cvf /tmp/${myname}-httpd-logs-${timestamp}.tar /var/log/apache2/*.log
 # Copying the tar file from tmp location to S3 bucket
 aws s3 cp /tmp/${myname}-httpd-logs-${timestamp}.tar s3://${s3_bucket}/${myname}-httpd-logs-${timestamp}.tar
 
-#laoding the tarfilesize to variable
+#loading the tarfilesize to variable
 tarFileSize=$(du -h /tmp/${myname}-httpd-logs-${timestamp}.tar | awk '{print $1}')
 
 # Creating inventory.html in /var/www/html/ and appending data to the file
