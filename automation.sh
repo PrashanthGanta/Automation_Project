@@ -40,7 +40,7 @@ else
     fi
 fi
 
-##Creating tar file and copying the tar file s3
+##Creating tar file and copying the tar file to s3
 
 # Time stamp
 timestamp=$(date '+%d%m%Y-%H%M%S')
