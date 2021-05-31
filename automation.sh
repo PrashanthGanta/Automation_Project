@@ -40,7 +40,7 @@ else
     fi
 fi
 
-##Creating tar file and copying the tar file s3
+##Creating tar file and copying the tar file to s3
 
 # Time stamp
 timestamp=$(date '+%d%m%Y-%H%M%S')
@@ -50,3 +50,30 @@ tar -cvf /tmp/${myname}-httpd-logs-${timestamp}.tar /var/log/apache2/*.log
 
 # Copying the tar file from tmp location to S3 bucket
 aws s3 cp /tmp/${myname}-httpd-logs-${timestamp}.tar s3://${s3_bucket}/${myname}-httpd-logs-${timestamp}.tar
+
+#loading the tarfilesize to variable
+tarFileSize=$(du -h /tmp/${myname}-httpd-logs-${timestamp}.tar | awk '{print $1}')
+
+# Creating inventory.html in /var/www/html/ and appending data to the file
+if [ -f /var/www/html/inventory.html ]
+then
+	echo httpd-logs $'\t' ${timestamp} $'\t' tar $'\t' ${tarFileSize} | tee -a /var/www/html/inventory.html
+else
+	echo Log Type $'\t' Time Created $'\t\t' Type $'\t' Size | tee /var/www/html/inventory.html
+	echo httpd-logs $'\t' ${timestamp} $'\t' tar $'\t' ${tarFileSize} | tee -a /var/www/html/inventory.html
+fi
+
+# To set cron job task
+# As the specific time is not mentined in the task, i am scheduling the cronjob to run at 9:01 Am every day
+if [ -f /etc/cron.d/automation ]
+then
+        task="1 9 * * * root /root/Automation_Project/automation.sh"
+        cronJonTask=$(head -1 /etc/cron.d/automation)
+        if [[ "$cronJonTask" = $task ]]; then
+                echo "cron job is set already"
+		else
+			echo "1 9 * * * root /root/Automation_Project/automation.sh" | tee /etc/cron.d/automation
+        fi
+else
+        echo "1 9 * * * root /root/Automation_Project/automation.sh" | tee /etc/cron.d/automation
+fi
